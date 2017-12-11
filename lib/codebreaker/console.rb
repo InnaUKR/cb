@@ -47,7 +47,7 @@ module Codebreaker
     end
 
     def propose_save
-      return until save?
+      return unless save?
       name = ask_name
       File.open(SCORES_FILE_PATH, 'a') do |f|
         f.puts("#{name}, #{game.difficulty}, #{game.attempts_numb}, #{game.hints_numb}")
