@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Codebreaker
   RSpec.describe Codebreaker::Game do
-    let(:game) { Game.new }
+    let(:game) { subject}
 
     describe '#generates secret code' do
       before(:each) { game.send(:generate_secret_code) }

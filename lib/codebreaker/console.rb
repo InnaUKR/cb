@@ -7,7 +7,7 @@ module Codebreaker
 
     def initialize
       @phrases = YAML.load_file(PHRASES_PATH)
-      end
+    end
 
     def start
       @game = Game.new
