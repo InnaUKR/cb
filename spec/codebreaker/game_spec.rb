@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 module Codebreaker
-  RSpec.describe Game do
+  RSpec.describe Codebreaker::Game do
     let(:game) { Game.new }
 
     describe '#generates secret code' do
       before(:each) { game.send(:generate_secret_code) }
+
       it 'generates not empty secret code' do
         expect(game.instance_variable_get(:@secret_code)).not_to be_empty
       end
@@ -106,12 +107,71 @@ module Codebreaker
 
       it 'secret code include number from hint' do
         game.instance_variable_set(:@gotten_hints, [])
-        expect(game.instance_variable_get(:@secret_code).include?(game.send(:take_hint)))
+        expect(game.instance_variable_get(:@secret_code).include?(game.send(:take_hint!)))
       end
 
       it 'always returns different prompts' do
         game.instance_variable_set(:@gotten_hints, [0, 1, 2])
-        expect(game.send(:take_hint)).to eq(4)
+        expect(game.send(:take_hint!)).to eq(4)
+      end
+    end
+
+    describe '#got_guess_code?' do
+      it 'contains numbers not from range' do
+        expect(game.got_guess_code?([1, 8, 9, 7])).to be_falsey
+      end
+
+      it 'contains more numbers than it should be' do
+        expect(game.got_guess_code?([1, 2, 3, 4, 5])).to be_falsey
+      end
+
+      it 'contains corect numbers' do
+        expect(game.got_guess_code?([1, 2, 3, 4])).to be_truthy
+      end
+    end
+
+    describe '#chose_difficulty?' do
+      it 'chose easy difficulty' do
+        expect(game.chose_difficulty?('easy')).to be_truthy
+      end
+
+      it 'chose medium difficulty' do
+        expect(game.chose_difficulty?('medium')).to be_truthy
+      end
+
+      it 'chose hard difficulty' do
+        expect(game.chose_difficulty?('hard')).to be_truthy
+      end
+
+      it 'chose incorect difficulty' do
+        expect(game.chose_difficulty?('level 1')).to be_falsey
+      end
+    end
+
+    describe '#choose_difficulty' do
+      it 'chose easy difficulty' do
+        game.choose_difficulty('easy')
+        expect(game.difficulty).to eq(:easy)
+        expect(game.attempts_numb).to eq(30)
+        expect(game.hints_numb).to eq(3)
+      end
+
+      it 'chose medium difficulty' do
+        game.choose_difficulty('medium')
+        expect(game.difficulty).to eq(:medium)
+        expect(game.attempts_numb).to eq(15)
+        expect(game.hints_numb).to eq(2)
+      end
+
+      it 'chose hard difficulty' do
+        game.choose_difficulty('hard')
+        expect(game.difficulty).to eq(:hard)
+        expect(game.attempts_numb).to eq(10)
+        expect(game.hints_numb).to eq(1)
+      end
+
+      it 'chose incorect difficulty' do
+        expect { game.choose_difficulty('level 2') }.to raise_error(ArgumentError)
       end
     end
   end
